@@ -9,6 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/metadata"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 )
@@ -23,16 +24,26 @@ func main() {
 	}
 
 	dc := dynamic.NewForConfigOrDie(config)
-	nodes, err := dc.Resource(schema.GroupVersionResource{
+	gvrNode := schema.GroupVersionResource{
 		Group:    "",
 		Version:  "v1",
 		Resource: "nodes",
-	}).List(context.TODO(), metav1.ListOptions{})
+	}
+	nodes, err := dc.Resource(gvrNode).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
 
 	for _, obj := range nodes.Items {
 		fmt.Printf("%+v\n", obj.GetName())
+	}
+
+	mc := metadata.NewForConfigOrDie(config)
+	nodemeta, err := mc.Resource(gvrNode).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		panic(err)
+	}
+	for _, n := range nodemeta.Items {
+		fmt.Println(n.GetName())
 	}
 }
