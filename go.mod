@@ -9,5 +9,4 @@ require (
 	k8s.io/apimachinery v0.21.1
 	k8s.io/client-go v0.21.1
 	k8s.io/utils v0.0.0-20210111153108-fddb29f9d009 // indirect
-	sigs.k8s.io/cli-utils v0.25.0
 )

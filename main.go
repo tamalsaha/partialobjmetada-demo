@@ -11,7 +11,6 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
-	"sigs.k8s.io/cli-utils/pkg/kstatus/status"
 )
 
 func main() {
@@ -34,11 +33,6 @@ func main() {
 	}
 
 	for _, obj := range nodes.Items {
-		s, err := status.Compute(&obj)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("%+v\n", *s)
+		fmt.Printf("%+v\n", obj.GetName())
 	}
-
 }
