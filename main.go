@@ -3,18 +3,36 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
-	"path/filepath"
-
+	"github.com/Masterminds/semver/v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/metadata"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
+	"log"
+	"path/filepath"
 )
 
+
 func main() {
+	vp, err := semver.NewVersion("v1.2.3-alpha.0+buil9")
+	if err != nil {
+		panic(err)
+	}
+	v := *vp
+	v, err = v.SetPrerelease("")
+	if err != nil {
+		panic(err)
+	}
+	v, err = v.SetMetadata("")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(v.Original())
+}
+
+func main_() {
 	masterURL := ""
 	kubeconfigPath := filepath.Join(homedir.HomeDir(), ".kube", "config")
 
