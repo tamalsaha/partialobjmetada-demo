@@ -4,18 +4,21 @@ import (
 	"context"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
+	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/metadata"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
+	"kmodules.xyz/client-go/discovery"
 	"log"
 	"path/filepath"
 )
 
 
-func main() {
+func main__() {
 	vp, err := semver.NewVersion("v1.2.3-alpha.0+buil9")
 	if err != nil {
 		panic(err)
@@ -30,9 +33,11 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(v.Original())
+
+	v.IncPatch()
 }
 
-func main_() {
+func main() {
 	masterURL := ""
 	kubeconfigPath := filepath.Join(homedir.HomeDir(), ".kube", "config")
 
@@ -40,6 +45,12 @@ func main_() {
 	if err != nil {
 		log.Fatalf("Could not get Kubernetes config: %s", err)
 	}
+
+	kc := kubernetes.NewForConfigOrDie(config)
+
+	m := discovery.NewRestMapper(kc.Discovery())
+	rsm := discovery.NewResourceMapper(m)
+	rsm.Reset()
 
 	dc := dynamic.NewForConfigOrDie(config)
 	gvrNode := schema.GroupVersionResource{
@@ -49,6 +60,9 @@ func main_() {
 	}
 	nodes, err := dc.Resource(gvrNode).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
+		if kerr.IsNotFound(err) {
+			fmt.Println(err.Error())
+		}
 		panic(err)
 	}
 
