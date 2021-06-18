@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -15,8 +17,8 @@ import (
 	"kmodules.xyz/client-go/discovery"
 	"log"
 	"path/filepath"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
-
 
 func main__() {
 	vp, err := semver.NewVersion("v1.2.3-alpha.0+buil9")
@@ -36,6 +38,12 @@ func main__() {
 
 	v.IncPatch()
 }
+
+type Object interface {
+	metav1.Object
+	runtime.Object
+}
+
 
 func main() {
 	masterURL := ""
@@ -67,6 +75,7 @@ func main() {
 	}
 
 	for _, obj := range nodes.Items {
+		copytest(&obj)
 		fmt.Printf("%+v\n", obj.GetName())
 	}
 
@@ -78,4 +87,15 @@ func main() {
 	for _, n := range nodemeta.Items {
 		fmt.Println(n.GetName())
 	}
+}
+
+func copytest(obj client.Object) {
+	o2 := obj.DeepCopyObject().(client.Object)
+	o2.SetManagedFields(nil)
+
+	dobj, _ := json.MarshalIndent(obj, "", "  ")
+	fmt.Println(string(dobj))
+	fmt.Println("--------------------------------")
+	d2, _ := json.MarshalIndent(o2, "", "  ")
+	fmt.Println(string(d2))
 }

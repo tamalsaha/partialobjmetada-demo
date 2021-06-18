@@ -4,10 +4,8 @@ go 1.16
 
 require (
 	github.com/Masterminds/semver/v3 v3.1.1
-	github.com/imdario/mergo v0.3.10 // indirect
-	google.golang.org/appengine v1.6.6 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 	k8s.io/apimachinery v0.21.1
 	k8s.io/client-go v0.21.1
 	kmodules.xyz/client-go v0.0.0-20210617062405-068a00678a92
+	sigs.k8s.io/controller-runtime v0.9.0
 )
